@@ -21,54 +21,55 @@ class Player(object):
     def get_inventory(self):
         return self.__inventory
 
-    def __mine(self):
+    def mine(self):
         """
         Mine an ore. It takes 3 real time seconds to mine an ore. Ores are randomly dropped.
         """
         random.seed()
         print('Starting to mine...')
         time.sleep(3)
-        weights = [self.luck * weight for weight in DEFAULT_PROBABLITY.values()]
+        weights = [self.__luck * weight for weight in DEFAULT_PROBABLITY.values()]
         found = random.choices(population=list(DEFAULT_PROBABLITY.keys()), weights=weights, k=1)
+        self.add_to_shop(found[0])
         print(f'You finished mining and found {object_name(found[0])}!')
         return found[0]
 
-    def __add_to_shop(self, ore):
+    def add_to_shop(self, ore):
         """
         Add an unit of ore that you mined to your shop.
         """
-        if ore not in self.inventory.keys():
+        if ore not in self.__inventory.keys():
             print(f'Congratulations, You found {object_name(ore)} for the first time!')
-            self.inventory[ore] = 1
+            self.__inventory[ore] = 1
         else:
             print(f'Adding {object_name(ore)} to your inventory')
-            self.inventory[ore] += 1
+            self.__inventory[ore] += 1
         
 
-    def __sell_from_shop(self, ore, quantity):
+    def sell_from_shop(self, ore, quantity):
         """
         Sell ores from your shop for money.
         """
-        if self.inventory[ore] >= quantity:
-            self.inventory[ore] -= quantity
+        if self.__inventory[ore] >= quantity:
+            self.__inventory[ore] -= quantity
             price = AVAILABLE_ORES[ore]
-            self.money += price
+            self.__money += price
             print(f'You sold {quantity} {object_name(ore)} and gained {price} coins')
-            return self.quantity
+            return quantity
         else:
             print('Not enough ores to sell')
             return None
 
-    def __buy_asset(self, asset):
+    def buy_asset(self, asset):
         """
         Buy an asset to increase your chances of getting better ores!
         """
         cost = AVAILABLE_ASSETS[asset]
-        if self.money >= cost and asset not in self.assets:
-            self.money -= cost
-            self.luck *= LUCK_MULTIPLIERS[asset]
+        if self.__money >= cost and asset not in self.__assets:
+            self.__money -= cost
+            self.__luck *= LUCK_MULTIPLIERS[asset]
             print(f'Congratulations, you just bought the {object_name(asset)}!')
-            self.assets.add(asset)
+            self.__assets.add(asset)
             return asset
         else:
             print(f'Not enough coins to purchase {object_name(asset)}')
